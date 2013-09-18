@@ -28,7 +28,6 @@ Installation
 To install backseat run:
 ```
 # gem install backseat
-
 ```
 After the installation you have to prepare your filesystem for backseat. The
 default root directory is `/srv/backseat`.
@@ -43,7 +42,6 @@ Example structure:
 /srv/backseat/host2/
 /srv/backseat/host2/backup-2013-09-12/
 /srv/backseat/host2/backup-2013-09-11/
-
 ```
 
 It's also possible to use symbolic links to connect the backup candidates
@@ -53,7 +51,6 @@ the backups.
 Example:
 ```
 ln -s /srv/nfs4/backups/host1/ /srv/backseat/host1/
-
 ```
 Configuration
 -------------
