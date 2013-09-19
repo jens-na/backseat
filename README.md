@@ -65,17 +65,18 @@ backseat:
   root: /srv/backseat/
 
 #
-# Host configuration section
+# Candidates configuration section
 #
-grace:
-  preexec:
-  postexec:
-  notifications: [nobackup]
+candidates:
+  grace:
+    preexec:
+    postexec:
+    notifications: [nobackup]
 
-tiros:
-  preexec: 
-  postexec:
-  notifications: [nobackup, newbackup]
+  tiros:
+    preexec: 
+    postexec:
+    notifications: [nobackup, newbackup]
 
 #
 # Notification section
