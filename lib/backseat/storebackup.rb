@@ -19,6 +19,8 @@ module Backseat
       next if item == '.' or item == '..'
         backups.push(item)  
       end
+
+      return backups
     end
   end
 end

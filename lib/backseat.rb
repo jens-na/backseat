@@ -1,2 +1,4 @@
 require 'backseat/base'
-require 'backseat/backup'
+require 'backseat/backuptool'
+require 'backseat/rsnapshot'
+require 'backseat/storebackup'

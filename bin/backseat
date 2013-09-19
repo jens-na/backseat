@@ -2,6 +2,9 @@
 
 begin
   require 'backseat'
+  require 'getoptlong'
+  require 'yaml'
+  require 'file'
 rescue LoadError
   require 'rubygems'
   require 'backseat'
@@ -9,4 +12,50 @@ end
 
 module Backseat
 
+  check = false
+  file = "/etc/backseat.yml"
+  root = "/srv/backseat/"
+
+  opts = GetoptLong.new(
+    [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
+    [ '--file', '-f', GetoptLong::REQUIRED_ARGUMENT ],
+    [ '--check', '-c', GetoptLong::NO_ARGUMENT ]
+  )
+
+  opts.each do |opt,arg|
+    case opt
+      when '--help'
+        puts <<-EOF
+Usage: backseat [OPTIONS]
+
+-c, --check
+  check the backups of all configured backup candidates
+
+-f, --file
+  an alternaive configuration file of backseat
+
+-h, --help
+  show help
+  
+        EOF
+        exit 0
+      when '--file'
+        file = arg
+      when '--check'
+        check = true
+    end
+  end
+  
+  # config
+  config = YAML.load_file(file)
+  root = config['backseat']['root']
+
+  # candidates
+  candidates = config['candidates']
+  candidates.each do |name,value|
+    cFile = File.absolute_path(root + name)
+    unless File.exists?(cFile)
+      raise 'Backup directory \'' + cFile + '\' for \'' + name + '\' does not exist.'
+    end
+  end
 end
