@@ -5,7 +5,8 @@ Overview
 Features
 --------
   - Customizable notifications
-  - serverside pre-exec and post-exec actions
+  - RSS feeds 
+  - Exec functions
 
 Support
 -------
