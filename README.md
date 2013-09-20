@@ -1,6 +1,6 @@
 Overview
 ========
-backseat is an observer for network based backups.
+**backseat** is an observer for network based backups.
 
 Features
 --------
@@ -21,37 +21,18 @@ Take a look at the Contributing section.
 Dependencies
 ------------
   - ruby
+  - ...
 
 Installation
 ------------
-
 To install backseat run:
 ```
 # gem install backseat
 ```
-After the installation you have to prepare your filesystem for backseat. The
-default root directory is `/srv/backseat`.
 
-In this directory the backup candidates and their backups resides.
+Afterwards you need to configure your backup candidates and their notifications in
+the configuration file `/etc/backseat.yml`. See the Configuration section below.
 
-Example structure:
-```
-/srv/backseat/host1/
-/srv/backseat/host1/backup-2013-09-12/
-/srv/backseat/host1/backup-2013-09-11/
-/srv/backseat/host2/
-/srv/backseat/host2/backup-2013-09-12/
-/srv/backseat/host2/backup-2013-09-11/
-```
-
-It's also possible to use symbolic links to connect the backup candidates
-with
-the backups.
-
-Example:
-```
-ln -s /srv/nfs4/backups/host1/ /srv/backseat/host1/
-```
 Configuration
 -------------
 Backseats configuration file is placed in `/etc/backseat.yml`. Backseat uses
@@ -106,8 +87,9 @@ candidates:
         via: [exec, rss]
 ```
 
-Contributing
+Contribution
 ------------
+Coming soon.
 
 License and Copyright
 =====================
