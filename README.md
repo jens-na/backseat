@@ -62,41 +62,48 @@ the data serialization format YAML for it's configuration files.
 # Backseat basic configuration
 #
 backseat:
-  root: /srv/backseat/
+
+  # the RSS settings which are used if there is 
+  # something to notify.
+  rss:
+    author: Jens Nazarenus
+    title: Backups
+    output: /srv/http/htdocs/backup.rss
+
+  # The executable settings
+  # $1: notification type (nobackup, newbackup)
+  # $2: backup candidate
+  # $3: backup candidate's root directory
+  exec:
+    executable: /usr/local/bin/myscript.sh
+
 
 #
 # Candidates configuration section
 #
-candidates:
-  grace:
-    preexec:
-    postexec:
-    notifications: [nobackup]
+candidates: 
 
-  tiros:
-    preexec: 
-    postexec:
-    notifications: [nobackup, newbackup]
+  host1:
+    root: /srv/nfs4/backups/host1
+    backuptool: storebackup
 
-#
-# Notification section
-#
-notifications:
+    notifications:
+      nobackup:
+        expire: 3
+        via: [rss]
+      newbackup:
+        via: [exec, rss]
 
-  # No backup available for N days.
-  nobackup:
-    active: true
-    days: 3
-    via: [api, rss, mail]
-    message: |
-      No backup of %1 for %2 days.
+  host2:
+    root: /srv/nfs4/backups/host2
+    backuptool: storebackup
 
-  # New backup available
-  newbackup:
-    active: true
-    via: [api, rss, mail]
-    message: |
-      New backup of %1 available.
+    notifications:
+      nobackup:
+        expire: 10
+        via: [rss]
+      newbackup:
+        via: [exec, rss]
 ```
 
 Contributing

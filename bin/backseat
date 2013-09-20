@@ -46,16 +46,15 @@ Usage: backseat [OPTIONS]
     end
   end
   
-  # config
-  config = YAML.load_file(file)
-  root = config['backseat']['root']
+config = Config.new(file)
+begin
+  config.check
+rescue Exception => e
+  puts e
+  exit 1
+end
 
-  # candidates
-  candidates = config['candidates']
-  candidates.each do |name,value|
-    cFile = File.absolute_path(root + name)
-    unless File.exists?(cFile)
-      raise 'Backup directory \'' + cFile + '\' for \'' + name + '\' does not exist.'
-    end
-  end
+cfg_obj = config.cfg
+
+
 end

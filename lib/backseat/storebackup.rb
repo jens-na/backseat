@@ -15,11 +15,11 @@ module Backseat
 
     def get_backups
       backups = Array.new
+
       Dir.foreach(@root) do |item|
       next if item == '.' or item == '..'
         backups.push(item)  
       end
-
       return backups
     end
   end
