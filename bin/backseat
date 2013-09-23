@@ -56,5 +56,13 @@ end
 
 cfg = config.cfg
 
+root = cfg['candidates']['grace']['root']
+
+storebackup = Storebackup.new(root)
+backups = storebackup.get_backups
+
+backups.each do |item|
+  puts(item.filename + " - " + item.time.to_s)
+end
 
 end

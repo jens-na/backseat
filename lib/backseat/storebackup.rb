@@ -18,7 +18,11 @@ module Backseat
 
       Dir.foreach(@root) do |item|
       next if item == '.' or item == '..'
-        backups.push(item)  
+        file = @root + item
+        time = File.mtime(file)
+
+        backup = Backup.new(file, time)
+        backups.push(backup)  
       end
       return backups
     end
