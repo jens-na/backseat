@@ -17,11 +17,7 @@ module Backseat
 
       candidates.each do |name,value|
         root = @cfg['candidates'][name]['root']
-        tool = @cfg['candidates'][name]['backuptool']
         
-        # TODO
-        # Check if #{tool} is Class and a Subclass of Backseat::Backuptool.
-
         notifications = @cfg['candidates'][name]['notifications']
         nobackup = notifications['nobackup']
         newbackup = notifications['newbackup']
