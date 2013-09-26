@@ -74,6 +74,13 @@ candidates:
         via: [exec, rss]
 ```
 
+Usage
+-----
+List all configured backup candidates
+```
+  # backseat --list-candidates
+```
+
 Contribution
 ------------
 Coming soon.
