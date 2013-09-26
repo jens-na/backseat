@@ -8,21 +8,9 @@ Features
   - RSS feeds 
   - Exec functions
 
-Support
--------
-backseat supports network backups of the following backup utilities out of 
-the box:
-
-  - rsnapshot
-  - storebackup
-
-Anyway, it is easy to write your own implementation for your favorite backup utility. 
-Take a look at the Contributing section.
-
 Dependencies
 ------------
   - ruby
-  - ...
 
 Installation
 ------------
@@ -67,7 +55,6 @@ candidates:
 
   host1:
     root: /srv/nfs4/backups/host1
-    backuptool: storebackup
 
     notifications:
       nobackup:
@@ -78,7 +65,6 @@ candidates:
 
   host2:
     root: /srv/nfs4/backups/host2
-    backuptool: storebackup
 
     notifications:
       nobackup:
