@@ -13,13 +13,14 @@ end
 module Backseat
 
   check = false
+  cand_name = nil
   file = "/etc/backseat.yml"
   root = "/srv/backseat/"
 
   opts = GetoptLong.new(
     [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
     [ '--file', '-f', GetoptLong::REQUIRED_ARGUMENT ],
-    [ '--check', '-c', GetoptLong::NO_ARGUMENT ]
+    [ '--candidate', '-c', GetoptLong::REQUIRED_ARGUMENT ]
   )
 
   opts.each do |opt,arg|
@@ -36,13 +37,13 @@ Usage: backseat [OPTIONS]
 
 -h, --help
   show help
-  
+
         EOF
         exit 0
       when '--file'
         file = arg
-      when '--check'
-        check = true
+      when '--candidate'
+        cand_name = arg
     end
   end
   
@@ -55,5 +56,18 @@ rescue Exception => e
 end
 
 cfg = config.cfg
+
+if cand_name != nil
+  root = cfg['candidates'][cand_name]['root']
+  expire = cfg['candidates'][cand_name]['notifications']['nobackup']['expire']
+
+  cand = Candidate.new(cand_name, root, expire)
+
+  if cand.expired?
+    puts "expired"
+  else
+    puts "not expired!"
+  end
+end
 
 end

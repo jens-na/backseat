@@ -13,11 +13,17 @@ module Backseat
     # Checks if the candidate is expired. Which means that the latest
     # backup is older than @expire days.
     def expired?
-      if @expire == 0
+      if @expire != 0
         latest = get_latest_backup
         unless latest == nil
-          time_minus = Time.now - 60 * 60 * 24 * @expire
-          time_backup = latest.time
+          time_now = Time.now.to_i - (60 * 60 * 24 * @expire)
+          time_latest = latest.time.to_i
+
+          if time_now > time_latest
+            return true
+          else
+            return false
+          end
         end
       end
       return false
@@ -27,20 +33,18 @@ module Backseat
     # of the candidate.
     def get_latest_backup
       backups = get_backups
-
+      return backups.last
     end
 
-    # Returns the backups of the candidate.
+    # Returns the backups of the candidate sorted by mtime.
     def get_backups
       backups = Array.new
 
-      Dir.foreach(@root) do |item|
-      next if item == '.' or item == '..'
-        file = @root + item
-        time = File.mtime(file)
+      Dir.entries(@root).sort_by{|a| File.stat(@root + a).mtime}.each do |f|
+        next if f == '.' or f == '..'
 
-        backup = Backup.new(file, time)
-        backups.push(backup)  
+        backup = Backup.new(@root + f, File.mtime(@root + f))
+        backups.push(backup)
       end
       return backups
     end
