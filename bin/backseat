@@ -13,6 +13,7 @@ end
 module Backseat
 
   check = false
+  list_cand = false
   cand_name = nil
   file = "/etc/backseat.yml"
   root = "/srv/backseat/"
@@ -20,7 +21,8 @@ module Backseat
   opts = GetoptLong.new(
     [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
     [ '--file', '-f', GetoptLong::REQUIRED_ARGUMENT ],
-    [ '--candidate', '-c', GetoptLong::REQUIRED_ARGUMENT ]
+    [ '--candidate', '-c', GetoptLong::REQUIRED_ARGUMENT ],
+    [ '--list-candidates', '-l', GetoptLong::NO_ARGUMENT ]
   )
 
   opts.each do |opt,arg|
@@ -29,11 +31,14 @@ module Backseat
         puts <<-EOF
 Usage: backseat [OPTIONS]
 
--c, --check
-  check the backups of all configured backup candidates
-
 -f, --file
   an alternaive configuration file of backseat
+
+-c, --candidate
+  specifies the candidate to use
+
+-l, --list-candidates
+  list the configured candidates
 
 -h, --help
   show help
@@ -44,6 +49,8 @@ Usage: backseat [OPTIONS]
         file = arg
       when '--candidate'
         cand_name = arg
+      when '--list-candidates'
+        list_cand = true
     end
   end
   
@@ -57,10 +64,18 @@ end
 
 cfg = config.cfg
 
+if list_cand
+  candidates = cfg['candidates']
+ 
+  candidates.each do |key,value|
+    puts key
+  end
+  exit 0
+end
+
 if cand_name != nil
   root = cfg['candidates'][cand_name]['root']
   expire = cfg['candidates'][cand_name]['notifications']['nobackup']['expire']
-
   cand = Candidate.new(cand_name, root, expire)
 
   if cand.expired?
@@ -69,5 +84,4 @@ if cand_name != nil
     puts "not expired!"
   end
 end
-
 end
