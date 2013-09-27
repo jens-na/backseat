@@ -12,9 +12,26 @@ end
 
 module Backseat
 
-  check = false
-  list_cand = false
+  # Returns the candidate to the config and the specified candidate name.
+  # Args: 
+  #  cfg - the backseat.yml config YAML
+  #  cand_name - the candidates name
+  def self.get_cand(cfg, cand_name)
+    root = cfg['candidates'][cand_name]['root']
+    expire = cfg['candidates'][cand_name]['notifications']['nobackup']['expire']
+    cand = Candidate.new(cand_name, root, expire)
+    return cand
+  end
+
+  # flags
+  flag_notify = false
+  flag_list_cand = false
+  flag_expired = false
+  flag_expired_code = false
+  
+  # other vars
   cand_name = nil
+  cand = nil
   file = "/etc/backseat.yml"
   root = "/srv/backseat/"
 
@@ -22,7 +39,10 @@ module Backseat
     [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
     [ '--file', '-f', GetoptLong::REQUIRED_ARGUMENT ],
     [ '--candidate', '-c', GetoptLong::REQUIRED_ARGUMENT ],
-    [ '--list-candidates', '-l', GetoptLong::NO_ARGUMENT ]
+    [ '--list-candidates', '-l', GetoptLong::NO_ARGUMENT ],
+    [ '--expired', '-e', GetoptLong::NO_ARGUMENT ],
+    [ '--expired-code', '-E', GetoptLong::NO_ARGUMENT ],
+    [ '--notify', '-n', GetoptLong::NO_ARGUMENT ]
   )
 
   opts.each do |opt,arg|
@@ -40,48 +60,81 @@ Usage: backseat [OPTIONS]
 -l, --list-candidates
   list the configured candidates
 
+-e, --expired
+  check the expired state for a candidate
+
 -h, --help
   show help
 
         EOF
         exit 0
-      when '--file'
+      when '--file'    
         file = arg
       when '--candidate'
         cand_name = arg
       when '--list-candidates'
-        list_cand = true
+        flag_list_cand = true
+      when '--expired'
+        flag_expired = true
+      when '--expired-code'
+        flag_expired_code = true
+      when '--notify'
+        flag_notify = true
     end
   end
   
-config = Config.new(file)
-begin
-  config.check
-rescue Exception => e
-  puts e
-  exit 1
-end
+  config = Config.new(file)
+  begin
+    config.check
+  rescue Exception => e
+    puts e
+    exit 1
+  end
 
-cfg = config.cfg
-
-if list_cand
+  cfg = config.cfg
   candidates = cfg['candidates']
- 
+
+  # list candidates
+  if flag_list_cand
+    candidates.each do |key,value|
+      puts key
+    end
+    exit 0
+  end
+
+  # check if candidate is expired
+  if flag_expired || flag_expired_code
+    if cand_name == nil
+      puts 'Backup candidate must be specifed with --candidate.'
+    else
+      cand = get_cand(cfg, cand_name)
+      if cand.expired?
+        if flag_expired_code
+          exit 1
+        else
+          puts 'yes'
+        end
+      else
+        if flag_expired_code
+          exit 0
+        else
+          puts 'no'
+        end
+      end
+    end
+    exit 0
+  end 
+
+  # list a summary if the program is still active
   candidates.each do |key,value|
-    puts key
-  end
-  exit 0
-end
+    cand = get_cand(cfg, key) 
+    backups = cand.get_backups.length
+    status = "not expired"
 
-if cand_name != nil
-  root = cfg['candidates'][cand_name]['root']
-  expire = cfg['candidates'][cand_name]['notifications']['nobackup']['expire']
-  cand = Candidate.new(cand_name, root, expire)
-
-  if cand.expired?
-    puts "expired"
-  else
-    puts "not expired!"
+    if cand.expired?
+      status = "expired"
+    end
+    puts "#{key}: #{backups} backups, #{status}"
   end
-end
+
 end
