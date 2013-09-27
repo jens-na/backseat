@@ -102,12 +102,6 @@ used to signal if the candidate is expired:
 ```
 
 
-
-
-Contribution
-------------
-Coming soon.
-
 License and Copyright
 =====================
 Licensed under the GNU General Public License 3.
