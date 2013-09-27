@@ -95,7 +95,8 @@ Checks if a specified candidate is expired. If `--expired-code` is specified the
 used to signal if the candidate is expired:
   - 1: expired
   - 0: not expired
-```
+
+``` 
   # backseat --candidate grace --expired
   # backseat --candidate grace --expired-code
 ```
