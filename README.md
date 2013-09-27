@@ -76,10 +76,31 @@ candidates:
 
 Usage
 -----
+Use an alternative configuration file for backseat
+```
+  # backseat --file /my/path/to/backseat.yml
+```
+
 List all configured backup candidates
 ```
   # backseat --list-candidates
 ```
+
+Specify an candidate for bakcseats CLI program
+```
+  # backseat --candidate host1
+```
+
+Checks if a specified candidate is expired. If `--expired-code` is specified the return value of the program is
+used to signal if the candidate is expired:
+  - 1: expired
+  - 0: not expired
+backseat --candidate grace --expired
+backseat --candidate grace --expired-code
+
+
+
+
 
 Contribution
 ------------
