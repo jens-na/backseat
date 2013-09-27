@@ -86,7 +86,7 @@ List all configured backup candidates
   # backseat --list-candidates
 ```
 
-Specify an candidate for bakcseats CLI program
+Specify an candidate for the backseat CLI program
 ```
   # backseat --candidate host1
 ```
