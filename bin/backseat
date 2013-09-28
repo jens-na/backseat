@@ -30,6 +30,7 @@ module Backseat
   flag_expired = false
   flag_expired_code = false
   flag_backups = false
+  flag_last_backup = false
   
   # other vars
   cand_name = nil
@@ -42,7 +43,8 @@ module Backseat
     [ '--file', '-f', GetoptLong::REQUIRED_ARGUMENT ],
     [ '--candidate', '-c', GetoptLong::REQUIRED_ARGUMENT ],
     [ '--list-candidates', '-l', GetoptLong::NO_ARGUMENT ],
-    [ '--list-backups', '-L', GetoptLong::NO_ARGUMENT ],
+    [ '--list-backups', '-b', GetoptLong::NO_ARGUMENT ],
+    [ '--last-backup', '-B', GetoptLong::NO_ARGUMENT ],
     [ '--expire-days', '-x', GetoptLong::NO_ARGUMENT ],
     [ '--expired', '-e', GetoptLong::NO_ARGUMENT ],
     [ '--expired-code', '-E', GetoptLong::NO_ARGUMENT ],
@@ -98,6 +100,8 @@ backseat home page: <http://github.com/jens-na/backseat/>
         flag_expire_days = true
       when '--list-backups'
         flag_backups = true
+      when '--last-backup'
+        flag_last_backup = true
     end
   end
   
@@ -120,6 +124,7 @@ backseat home page: <http://github.com/jens-na/backseat/>
     exit 0
   end
 
+  # List all backups of a specified candidate
   if flag_backups
     if cand_name == nil
       puts 'Backup candidate must be specifed with --candidate.'
@@ -128,8 +133,31 @@ backseat home page: <http://github.com/jens-na/backseat/>
       cand = get_cand(cfg, cand_name)
       backups = cand.get_backups
 
-      backups.each do |b|
-        puts b.filename
+      if backups == nil || backups.length == 0
+        puts "No backups available #{cand_name}"
+        exit 0
+      else 
+        backups.each do |b|
+          puts b.filename
+        end
+      end
+    end
+    exit 0
+  end
+
+  if flag_last_backup
+    if cand_name == nil
+      puts 'Backup candidate must be specifed with --candidate.'
+      exit 1
+    else
+      cand = get_cand(cfg, cand_name)
+      backups = cand.get_backups
+      
+      if backups == nil || backups.length == 0
+        puts "No backups available #{cand_name}"
+        exit 0
+      else
+        puts backups.last.filename
       end
     end
     exit 0
