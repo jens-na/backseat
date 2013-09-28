@@ -77,6 +77,13 @@ An observer for network based backups
     returns the configured expire time in days which is configured in 
     the backseat configuration file
 
+  -b, --list-backups
+    Prints a list of available backups for a candidate specified with
+    --candidate.
+
+  -B, --last-backup
+    Prints the latest backup of the specified candidate.
+
   -h, --help
     show help
 
