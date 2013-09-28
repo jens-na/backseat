@@ -26,6 +26,7 @@ module Backseat
   # flags
   flag_notify = false
   flag_list_cand = false
+  flag_expire_days = false
   flag_expired = false
   flag_expired_code = false
   
@@ -40,6 +41,7 @@ module Backseat
     [ '--file', '-f', GetoptLong::REQUIRED_ARGUMENT ],
     [ '--candidate', '-c', GetoptLong::REQUIRED_ARGUMENT ],
     [ '--list-candidates', '-l', GetoptLong::NO_ARGUMENT ],
+    [ '--expire-days', '-x', GetoptLong::NO_ARGUMENT ],
     [ '--expired', '-e', GetoptLong::NO_ARGUMENT ],
     [ '--expired-code', '-E', GetoptLong::NO_ARGUMENT ],
     [ '--notify', '-n', GetoptLong::NO_ARGUMENT ]
@@ -50,22 +52,32 @@ module Backseat
       when '--help'
         puts <<-EOF
 Usage: backseat [OPTIONS]
+An observer for network based backups
 
--f, --file
-  an alternaive configuration file of backseat
+  -f, --file <file>
+    an alternaive configuration file of backseat
 
--c, --candidate
-  specifies the candidate to use
+  -c, --candidate <name>
+    specifies the candidate to use
 
--l, --list-candidates
-  list the configured candidates
+  -l, --list-candidates
+    list the configured candidates
 
--e, --expired
-  check the expired state for a candidate
+  -e, --expired
+    check the expired state for a candidate
 
--h, --help
-  show help
+  -E, --expired-code
+    like --expired but uses exit codes to signal expired state
 
+  -x, --expire-days
+    returns the configured expire time in days which is configured in 
+    the backseat configuration file
+
+  -h, --help
+    show help
+
+Report bugs to: jens@0x6a.de
+backseat home page: <http://github.com/jens-na/backseat/>
         EOF
         exit 0
       when '--file'    
@@ -80,6 +92,8 @@ Usage: backseat [OPTIONS]
         flag_expired_code = true
       when '--notify'
         flag_notify = true
+      when '--expire-days'
+        flag_expire_days = true
     end
   end
   
@@ -94,10 +108,23 @@ Usage: backseat [OPTIONS]
   cfg = config.cfg
   candidates = cfg['candidates']
 
-  # list candidates
+  # list properly configured candidates
   if flag_list_cand
     candidates.each do |key,value|
       puts key
+    end
+    exit 0
+  end
+
+  # Prints the expire in days, which is configured in the backseat 
+  # configuration file
+  if flag_expire_days
+    if cand_name == nil
+      puts 'Backup candidate must be specifed with --candidate.'
+      exit 1
+    else
+      cand = get_cand(cfg, cand_name)
+      puts cand.expire
     end
     exit 0
   end
@@ -106,6 +133,7 @@ Usage: backseat [OPTIONS]
   if flag_expired || flag_expired_code
     if cand_name == nil
       puts 'Backup candidate must be specifed with --candidate.'
+      exit 1
     else
       cand = get_cand(cfg, cand_name)
       if cand.expired?
