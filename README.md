@@ -97,9 +97,19 @@ used to signal if the candidate is expired:
   - 0: not expired
 
 ``` 
-  # backseat --candidate grace --expired
-  # backseat --candidate grace --expired-code
+  # backseat --candidate host1 --expired
+  # backseat --candidate host1 --expired-code
 ```
+
+Returns a list of backups of the specified candidate
+``` 
+  # backseat --candidate host1 --list-backups
+``` 
+
+Prints the latest backup for a backup candidate
+``` 
+  # backseat --candidate host1 --last-backup
+``` 
 
 
 License and Copyright
