@@ -31,6 +31,7 @@ module Backseat
   flag_expired_code = false
   flag_backups = false
   flag_last_backup = false
+  flag_notify = false
   
   # other vars
   cand_name = nil
@@ -57,6 +58,9 @@ module Backseat
         puts <<-EOF
 Usage: backseat [OPTIONS]
 An observer for network based backups
+
+  -n, --notify
+    check the candidates and make notifications if necessary
 
   -f, --file <file>
     an alternaive configuration file of backseat
@@ -109,6 +113,8 @@ backseat home page: <http://github.com/jens-na/backseat/>
         flag_backups = true
       when '--last-backup'
         flag_last_backup = true
+      when '--notify'
+        flag_notify = true
     end
   end
   
@@ -128,6 +134,12 @@ backseat home page: <http://github.com/jens-na/backseat/>
     candidates.each do |key,value|
       puts key
     end
+    exit 0
+  end
+
+  # send notifications for all candidates or for a specific candidate
+  # if --candidate is provided
+  if flag_notify
     exit 0
   end
 
@@ -218,5 +230,4 @@ backseat home page: <http://github.com/jens-na/backseat/>
     end
     puts "#{key}: #{backups} backups, #{status}"
   end
-
 end
