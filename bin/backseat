@@ -16,20 +16,16 @@ module Backseat
   flag_remove_candidate = false
   flag_list_backups = false
   flag_check = false
-  flag_check_code = false
 
   cfgroot = "/etc/backseat/"
   argument = nil
-  expire_days = 3
 
   opts = GetoptLong.new(
     ['--help', '-h', GetoptLong::NO_ARGUMENT],
     ['--verbose', '-v', GetoptLong::NO_ARGUMENT],
     ['--version', '-V', GetoptLong::NO_ARGUMENT],
     ['--cfgroot', '-C', GetoptLong::REQUIRED_ARGUMENT],
-    ['--check', '-c', GetoptLong::REQUIRED_ARGUMENT],
-    ['--check-code', '-x', GetoptLong::REQUIRED_ARGUMENT],
-    ['--expire-days', '-e', GetoptLong::REQUIRED_ARGUMENT],
+    ['--check', '-c', GetoptLong::OPTIONAL_ARGUMENT],
     ['--add-candidate', '-a', GetoptLong::REQUIRED_ARGUMENT],
     ['--remove-candidate', '-r', GetoptLong::REQUIRED_ARGUMENT],
     ['--list-candidates', '-l', GetoptLong::NO_ARGUMENT],
@@ -49,12 +45,8 @@ An observer for network based backups.
 -l, --list-candidates                 List all available candidates
 -b, --list-backups <name>             List backups for a specified candidate
 
--c, --check <name>                    Check if the candidate has no new backups between 
-                                      today and the last N days. The expire timein days 
-                                      may be specified with --expire-days.
--x, --check-code <name>               Same like --check but the exit code signals if 
-                                      the candidate is expired. 0: not expired
--e, --expire-days <N>                 Specifies the expire time of a candidate (Def: 3)
+-c, --check [<name>]                  Check one or all candidates based on the candidates
+                                      configfile candidate.yml.
 
 -C, --cfgroot <path>                  Specifies an alternative config root direcotry
 -v, --verbose                         Be verbose
@@ -86,13 +78,9 @@ Copyright (C) 2013 Jens Nazarenus <jens@0x6a.de>
         argument = arg
       when '--check'
         flag_check = true
-        argument = arg
-      when '--check-code'
-        flag_check_code = true
-        argument = arg
-      when '--expire-days'
-        flag_expire_days = true
-        expire_days = arg.to_i
+        unless arg == nil
+          argument = arg
+        end
     end
   end
 
@@ -120,6 +108,7 @@ Copyright (C) 2013 Jens Nazarenus <jens@0x6a.de>
     unless File.exists?(cfgroot + basename)
       File.symlink(argument, cfgroot + basename)
     end
+    # TODO: add candidate.yml
     exit 0
   end
 
@@ -131,6 +120,7 @@ Copyright (C) 2013 Jens Nazarenus <jens@0x6a.de>
     if File.exists?(cfgroot + argument)
       File.delete(cfgroot + argument)
     end
+    # TODO: remove candidate.yml
     exit 0
   end
 
@@ -157,32 +147,26 @@ Copyright (C) 2013 Jens Nazarenus <jens@0x6a.de>
   #
   # check the candidates
   #
-  if flag_check || flag_check_code
-      if expire_days > 0
-        obj = Candidates.new(cfgroot)
-        candidate = obj.get_candidate(argument)
+  if flag_check 
+    candidates = Array.new
+    obj = Candidates.new(cfgroot)
 
-        if candidate == nil
-          puts "Candidate '#{argument}' is not configured in #{cfgroot}."
-          exit 1
-        end
-        
-        if candidate.expired?(expire_days)
-          if flag_check_code
-            exit 1
-          else
-            puts 'expired'
-          end
-        else
-          if flag_check_code 
-            exit 0
-          else
-            puts 'not expired'
-          end
-        end
-      else
-        raise Exception.new('Expire days specified with --expire-days must be > 0.')
-      end
+    if argument == nil
+      candidates = obj.get_candidates
+    else
+      candidate = obj.get_candidate(argument)
+      candidates.push(candidate)
+    end
+
+    if candidates.length == 0
+      raise Exception.new("No candidates configured.")
+      exit 1
+    end
+
+    candidates.each do |c|
+      c.notify
+    end
+
     exit 0
   end
 

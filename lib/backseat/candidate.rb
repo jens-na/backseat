@@ -10,6 +10,13 @@ module Backseat
       end
     end
 
+    # Actually prepare the notifications (rss, exec)
+    def notify
+      # TODO 
+    end
+
+    # Returns true of the latest backup of the candidate
+    # is older than N days.
     def expired?(days)
       if days != 0
         latest = get_latest_backup
@@ -27,11 +34,13 @@ module Backseat
       return false
     end
 
+    # Returns the latest backup
     def get_latest_backup
       backups = get_backups
       return backups.last
     end
 
+    # Returns all backups of the candidate sorted after mtime.
     def get_backups
       backups = Array.new
 

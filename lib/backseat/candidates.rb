@@ -38,16 +38,17 @@ module Backseat
       Dir.entries(@cfgdir).each do |f|
         next if f == '..'
         next if f == '.'
-
         dir = @cfgdir + f
         realpath = Pathname.new(dir).realpath.to_s
-        basename = File.basename(f)
- 
-        if basename == name && File.directory?(realpath) 
-          return Candidate.new(name, realpath)
+
+        if File.directory?(realpath)
+          basename = File.basename(f)
+          if basename == name 
+            return Candidate.new(name, realpath)
+          end
         end 
-        return nil
       end
+      return nil
     end
 
     attr_reader :cfgdir
