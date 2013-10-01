@@ -6,6 +6,9 @@ module Backseat
       @name = name
       @root = root
       @expire = 3
+      unless root.end_with?('/')
+        @root = @root + '/'
+      end
     end
 
     def expired?

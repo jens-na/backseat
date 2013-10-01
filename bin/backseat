@@ -10,8 +10,12 @@ end
 
 module Backseat
 
-  flag_verbose = true
-  flag_list_candidates = true
+  flag_verbose = false
+  flag_list_candidates = false
+  flag_add_candidate = false
+  flag_remove_candidate = false
+  flag_list_backups = false
+  flag_check = false
 
   cfgroot = "/etc/backseat/"
   argument = nil
@@ -20,8 +24,9 @@ module Backseat
     ['--help', '-h', GetoptLong::NO_ARGUMENT],
     ['--verbose', '-v', GetoptLong::NO_ARGUMENT],
     ['--cfgroot', '-c', GetoptLong::REQUIRED_ARGUMENT],
-    ['--add-candidate', '-n', GetoptLong::REQUIRED_ARGUMENT],
-    ['--remove-candidate', '-d', GetoptLong::REQUIRED_ARGUMENT],
+    ['--check', '-C', GetoptLong::OPTIONAL_ARGUMENT],
+    ['--add-candidate', '-a', GetoptLong::REQUIRED_ARGUMENT],
+    ['--remove-candidate', '-r', GetoptLong::REQUIRED_ARGUMENT],
     ['--list-candidates', '-l', GetoptLong::NO_ARGUMENT],
     ['--list-backups', '-b', GetoptLong::REQUIRED_ARGUMENT]
   )
@@ -33,6 +38,17 @@ module Backseat
 Usage: backseat [OPTIONS]
 An observer for network based backups.
 
+-a, --add-candidate <path>            Adds a candidate to the configuration
+-r, --remove-candidate <name>         Removes a given candidate from the configuration
+
+-l, --list-candidates                 List all available candidates
+-b, --list-backups <name>             List backups for a specified candidate
+
+-C, --check [<candidate>]             Check candidates 
+
+-c, --cfgroot <path>                  Specifies an alternative config root direcotry
+-v, --verbose                         Be verbose
+-h, --help                            Show this help
 
 Report bugs to: Jens Nazarenus <jens@0x6a.de>
 backseat home page: <http://github.com/jens-na/backseat/>
@@ -52,10 +68,19 @@ backseat home page: <http://github.com/jens-na/backseat/>
       when '--list-backups'
         flag_list_backups = true
         argument = arg
+      when '--check'
+        flag_check = true
+        argument = arg
     end
   end
 
+  unless cfgroot.end_with?('/')
+    cfgroot = cfgroot + '/'
+  end
+
+  #
   # list candidates
+  #
   if flag_list_candidates
     obj = Candidates.new(cfgroot)
 
@@ -64,4 +89,54 @@ backseat home page: <http://github.com/jens-na/backseat/>
     end
     exit 0
   end
+
+  #
+  # add a candidate to the backseat config folder
+  # 
+  if flag_add_candidate
+    basename = File.basename(argument)
+    unless File.exists?(cfgroot + basename)
+      File.symlink(argument, cfgroot + basename)
+    end
+    exit 0
+  end
+
+  #
+  # remove a candidate from the backseat config folder
+  # if the candidate exists.
+  #
+  if flag_remove_candidate
+    if File.exists?(cfgroot + argument)
+      File.delete(cfgroot + argument)
+    end
+    exit 0
+  end
+
+  #
+  # list backups for a specified candidate
+  #
+  if flag_list_backups
+    obj = Candidates.new(cfgroot)
+    candidate = obj.get_candidate(argument)
+
+    if candidate == nil
+      puts "Candidate '#{argument}' is not configured in #{cfgroot}."
+      exit 1
+    else
+      backups = candidate.get_backups
+      backups.each do |b|
+        puts b.get_name
+      end
+      puts "Total: #{backups.length}"
+    end
+    exit 0
+  end
+
+  #
+  # check the candidates
+  #
+  if flag_check
+    
+  end
+
 end
