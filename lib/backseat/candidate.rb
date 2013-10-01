@@ -5,17 +5,16 @@ module Backseat
     def initialize(name, root)
       @name = name
       @root = root
-      @expire = 3
       unless root.end_with?('/')
         @root = @root + '/'
       end
     end
 
-    def expired?
-      if @expire != 0
+    def expired?(days)
+      if days != 0
         latest = get_latest_backup
         unless latest == nil
-          time_now = Time.now.to_i - (60 * 60 * 24 * @expire)
+          time_now = Time.now.to_i - (60 * 60 * 24 * days)
           time_latest = latest.time.to_i
 
           if time_now > time_latest

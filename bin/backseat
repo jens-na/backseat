@@ -44,7 +44,10 @@ An observer for network based backups.
 -l, --list-candidates                 List all available candidates
 -b, --list-backups <name>             List backups for a specified candidate
 
--C, --check [<candidate>]             Check candidates 
+-e, --expire-days <N>                 Specifies the expire time of a candidate
+-C, --check <name>                    Check if the candidate has no new backups between 
+                                      today and the last N days. The expire timein days 
+                                      may be specified with --expire-days.
 
 -c, --cfgroot <path>                  Specifies an alternative config root direcotry
 -v, --verbose                         Be verbose
@@ -136,7 +139,12 @@ backseat home page: <http://github.com/jens-na/backseat/>
   # check the candidates
   #
   if flag_check
-    
+    obj = Candidates.new(cfgroot)
+
+    obj.get_candidates.each do |candidate|
+      
+    end
+    exit 0
   end
 
 end
