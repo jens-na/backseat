@@ -14,6 +14,7 @@ module Backseat
   flag_list_candidates = true
 
   cfgroot = "/etc/backseat/"
+  argument = nil
 
   opts = GetoptLong.new(
     ['--help', '-h', GetoptLong::NO_ARGUMENT],
@@ -41,10 +42,16 @@ backseat home page: <http://github.com/jens-na/backseat/>
       when '--cfgroot'
         cfg_root = arg
       when '--add-candidate'
+        flag_add_candidate = true
+        argument = arg
       when '--remove-candidate'
+        flag_remove_candidate = true
+        argument = arg
       when '--list-candidates'
         flag_list_candidates = true
       when '--list-backups'
+        flag_list_backups = true
+        argument = arg
     end
   end
 
@@ -55,5 +62,6 @@ backseat home page: <http://github.com/jens-na/backseat/>
     obj.get_candidates.each do |candidate|
       puts candidate.name + ' => ' + candidate.root
     end
+    exit 0
   end
 end
