@@ -155,16 +155,19 @@ Copyright (C) 2013 Jens Nazarenus <jens@0x6a.de>
       candidates = obj.get_candidates
     else
       candidate = obj.get_candidate(argument)
-      candidates.push(candidate)
+      if candidate != nil
+        candidates.push(candidate)
+      end
     end
 
     if candidates.length == 0
-      raise Exception.new("No candidates configured.")
+      raise Exception.new("Candidate(s) not found.")
       exit 1
     end
 
     candidates.each do |c|
-      c.notify
+      c.set_config(cfgroot + c.name + '.yml')
+      c.check
     end
 
     exit 0

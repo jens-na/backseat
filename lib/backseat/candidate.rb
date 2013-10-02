@@ -1,5 +1,7 @@
 module Backseat
 
+  require 'yaml'
+
   class Candidate
 
     def initialize(name, root)
@@ -10,9 +12,31 @@ module Backseat
       end
     end
 
-    # Actually prepare the notifications (rss, exec)
-    def notify
-      # TODO 
+    # Sets the candidate specific configuration file
+    def set_config(cfgfile)
+      @config = YAML.load_file(cfgfile)
+    end
+
+    # Actually check if the candidate is expired and
+    # exec notification channels
+    def check
+      if @config == nil
+        raise Exception.new("No candidate specific config file found for #{name}.") 
+        return
+      end
+
+      newbackup = @config['notifications']['newbackup']
+      nobackup = @config['notifications']['nobackup']
+
+      if nobackup && nobackup['enabled']
+        expire = nobackup['expire-days']
+        channels = nobackup['channel']
+        check_nobackup(expire, channels)
+      end
+
+      if newbackup && newbackup['enababled']
+        puts newbackup
+      end
     end
 
     # Returns true of the latest backup of the candidate
@@ -52,6 +76,24 @@ module Backseat
       end
       return backups
     end
+    
     attr_reader :name, :root
+
+    private
+
+    # Checks if candidate is expired and sends to defined channels
+    def check_nobackup(expire, channels=[])
+      creator = Channels.new(@config)
+      if expired?(expire)
+        channels.each do |c|
+          impl = creator.get(c)
+          impl.exec
+        end
+      end
+    end
+
+    def check_newbackup(last_known)
+
+    end
   end
 end

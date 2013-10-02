@@ -7,6 +7,7 @@ module Backseat
     end
 
     def exec
+      puts 'todo: rss feed'
     end
   end
 end
